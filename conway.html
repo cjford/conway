@@ -3,42 +3,53 @@
 <head>
 	<title>Conway's Game of Life</title>
 	<link rel = 'stylesheet' type = 'text/css' href = 'stylesheet.css'/>
-	<script src="http://code.jquery.com/jquery-latest.js"></script>
+	<script src='http://code.jquery.com/jquery-latest.js'></script>
 	<script type = 'text/javascript' src = 'conway.js' ></script>
 </head>
 
 <body>
 	<div id ='wrapper'>
+		<img id = 'conwayPic' src = 'conway.gif' alt = ''/>
 		<h1> Conway's Game of Life </h1>
-		<p>
-			Each cell in the grid has two possible states, dead and alive. In each new generation, the configuration of cells determines which ones live or die. See <a href = http://en.wikipedia.org/wiki/Conway's_Game_of_Life> this link </a> for more information.
-		</p> 
-
-		<h4> Rules </h4>
-		<ul>
-			<li>
-				A living cell with fewer than 2 or greater than 3 live neighbors will die.
-			</li>
-			<li>
-				A living cell with either two or three neighbors will survive into the next generation.
-			</li>
-			<li>
-				A Dead cell with exactly 3 live neighbors will become alive.
-			</li>
-		</ul> 
+		<span id = 'errorBox'></span>
 		
-		<p>
-			Click a square to toggle it's state between dead and alive. After pressing start, the automation begins, and each successive generation is computed and displayed.<br/><br/>
-			This page is a work in progress.
-		</p>
-		<button id = "startButton" onClick = 'toggleAnimation();'>Start</button>
-		<button id = "resetButton" onClick = 'resetGrid();'>Reset</button>
-		<span id = 'test'></span>
-		<br/><br/>        
+		<br/>
+		<div id = 'controlPanel'>
+			Update interval (ms): <input id = 'intervalInput' type='text' value = '500' onChange='updateInterval()' />
+			<input id = 'gridLineBox' type = 'checkbox' checked = '' onChange='drawGrid()'/>Show Grid Lines
+			<input id = 'randColorBox' type = 'checkbox'  onChange='drawGrid()'/>Random Colors
+			<span id = 'genCount'>Generation Count: 0</span>
+			<br/>
+			<button id = 'startButton' onClick = 'toggleAnimation();' onMouseOver = 'buttonMouseover(this);' onMouseOut = 'buttonMouseOut(this);'>Start</button>
+			<button id = 'clearButton' onClick = 'clearGrid();' onMouseOver = 'buttonMouseover(this);' onMouseOut = 'buttonMouseOut(this);'>Clear</button>
+			<button id = 'randomizeButton' onCLick = 'randomizeGrid();' onMouseOver = 'buttonMouseover(this);' onMouseOut = 'buttonMouseOut(this);'>Randomize</button>
+			<button id = 'stepButton' onClick = 'animate();' onMouseOver = 'buttonMouseover(this);' onMouseOut = 'buttonMouseOut(this);'>Next Generation</button>
+			<button id = 'saveButton' onClick = 'saveState();' onMouseOver = 'buttonMouseover(this);' onMouseOut = 'buttonMouseOut(this);'>Save State</button>
+			<button id = 'loadButton' onClick = 'loadState();' onMouseOver = 'buttonMouseover(this);' onMouseOut = 'buttonMouseOut(this);'>Load State</button>
+		</div>
 
-		<canvas id="canvas">
-			Unsupported browser.
+		<canvas id='canvas'>
+			Something went horribly wrong. 
 		</canvas>
+		
+		<div id = 'sidebar'>
+			<p>
+				Each cell in the grid has two possible states: dead and alive. In each new generation, the configuration of cells determines which ones live or die.
+			</p>
+			<h4> Rules </h4>
+			<ul>
+				<li>A living cell with fewer than two or greater than three live neighbors will die.</li>
+				<li>A living cell with either two or three neighbors will live to see the next generation.</li>
+				<li>A Dead cell with exactly three live neighbors will be reborn.</li>
+			</ul> 
+			
+			<p>
+				Click or drag squares to toggle their states between dead and alive. After pressing start, the automation begins, and each successive generation is computed and displayed.<br/><br/>
+				
+			See the <a href = "http://en.wikipedia.org/wiki/Conway's_Game_of_Life"> Wikipedia article </a> for more information.
+			</p> 
+		</div>
+		<hr/>
 	</div>
 </body>
 </html>

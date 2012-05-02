@@ -1,7 +1,87 @@
-#wrapper
+body
+{
+	background-color:#336633;
+	font-family:'Trebuchet MS', sans-serif;
+}
+
+button
 {
 	border:2px solid black;
-	padding:5px;
-	width:800px;
+	margin:5px 6px;
+	width:120px;
+}
+
+h1, h2, h3, h4
+{
+	display:inline;
+}
+
+hr
+{
+	clear:both;
+	margin:0px;
+	width:0px;
+}
+
+input, #genCount 
+{
+	margin-left:20px;
+}
+
+ul
+{
+	margin:0px;
+	padding-left:21px;
+}
+
+#canvas
+{
+	border:5px solid black;
+	float:left;
+}
+
+#controlPanel
+{
+	float:left;
+}
+
+#conwayPic
+{
+	border:2px solid black;
+	float:right;
+	width:306px;
+}
+
+#errorBox
+{
+	color:red;
+}
+
+#intervalInput
+{
+	margin-left:0px;
+	width:30px;
+}
+
+#sidebar
+{	
+	border:2px solid black;
+	float:right;
+	height:470px;
+	padding:8px;
+	width:290px; 
+}
+
+#startButton
+{
+	margin-left:0px;
+}
+
+#wrapper
+{
+	background-color:#99CC99;
+	border:2px solid black;
 	margin:auto;
+	padding:6px 6px 4px 6px;
+	width:1125px;
 }

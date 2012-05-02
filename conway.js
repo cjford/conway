@@ -10,29 +10,44 @@ $(document).ready(function()
 	canvas.setAttribute("height", cellSize * gridHeight);
 	canvas.setAttribute("width", cellSize * gridWidth);
 	context = canvas.getContext("2d");
-
+	
 	state = new Array(gridWidth);
-	last_update = new Array(2);
-	mousedown = false;
-	running = false;
-	timer = 0;
+	savedState = new Array(gridWidth);
+	lastUpdate = new Array(2);
+	mouseDownCoords = new Array(2);
+	
+	genCount = 0;
+	updateTimer = 0;
+	isRunning = false;
+	mouseIsDown = false;
 
 	for(var x = 0; x <= gridWidth; x++)
 	{
 		state[x] = new Array(gridHeight);
+		savedState[x] = new Array(gridHeight);
 		for(var y = 0; y <= gridHeight; y++)
 		{
 			updateCell(x, y, 0);
 		}
 	}
 	
-	canvas.addEventListener('mousedown', function(){mousedown = true;}, false);
-	canvas.addEventListener('mouseup', function(){mousedown = false;}, false);
+	canvas.addEventListener('mousedown', mouseDownHandler, false);
+	canvas.addEventListener('mouseup', function(){mouseIsDown = false;}, false);
 	canvas.addEventListener('mousemove', cellClickHandler, false);
 	canvas.addEventListener('click', cellClickHandler, false);	
 });
 
-
+function drawGrid()
+{
+	for(var x = 0; x <= gridWidth; x++)
+	{
+		for(var y = 0; y <= gridHeight; y++)
+		{
+			updateCell(x, y, state[x][y]);
+		}
+	}
+}
+	
 function getCanvasCoords(evt)
 {
 	var obj = canvas;
@@ -49,22 +64,29 @@ function getCanvasCoords(evt)
 
 	return_coords[0] = Math.floor((evt.clientX - left_total + window.pageXOffset) / cellSize);
 	return_coords[1] = Math.floor((evt.clientY - top_total + window.pageYOffset) / cellSize);
-
 	return return_coords;
 }
 
+function mouseDownHandler(evt)
+{
+	mouseIsDown = 'true';
+	mouseDownCoords = getCanvasCoords(evt);
+}
 
 function cellClickHandler(evt)
 {	
+	var new_state;
 	var canvas_coords = getCanvasCoords(evt);
 	var cell_x = canvas_coords[0];
 	var cell_y = canvas_coords[1];
-	var new_state;
 	
 	new_state = state[cell_x][cell_y];
 	
 	if(evt.type == 'click')
-	{
+	{	
+		var mouse_up_coords = getCanvasCoords(evt);
+		if(mouseDownCoords[0] != mouse_up_coords[0] || mouseDownCoords[1] != mouse_up_coords[1]){return;}
+
 		if((state[cell_x][cell_y] == 1))
 		{
 			new_state = 0;
@@ -73,12 +95,12 @@ function cellClickHandler(evt)
 		{
 			new_state = 1;
 		}
-		last_update[0] = cell_x;
-		last_update[1] = cell_y;
+		lastUpdate[0] = cell_x;
+		lastUpdate[1] = cell_y;
 		updateCell(cell_x, cell_y, new_state);
 	}
 	
-	if(mousedown  && ((last_update[0] != cell_x) || (last_update[1] != cell_y)))
+	if(mouseIsDown  && ((lastUpdate[0] != cell_x) || (lastUpdate[1] != cell_y)))
 	{
 		if((state[cell_x][cell_y] == 1))
 		{
@@ -88,8 +110,8 @@ function cellClickHandler(evt)
 		{
 			new_state = 1;
 		}
-		last_update[0] = cell_x;
-		last_update[1] = cell_y;
+		lastUpdate[0] = cell_x;
+		lastUpdate[1] = cell_y;
 		updateCell(cell_x, cell_y, new_state);
 	}
 
@@ -98,35 +120,78 @@ function cellClickHandler(evt)
 
 function updateCell(x, y, new_state)
 {
+	var gridLineBox = document.getElementById('gridLineBox');
+	var randColorBox = document.getElementById('randColorBox');
 	context.beginPath();
-	context.strokeStyle = 'black';
 	context.fillStyle = 'white';
+	context.strokeStyle = (gridLineBox.checked ? 'black' : 'white');
 	context.rect((x * cellSize), (y * cellSize), cellSize, cellSize);
 	state[x][y] = new_state;
 	if(new_state == 1)
 	{
-		context.fillStyle = 'black';
+		if(!randColorBox.checked)
+		{
+			context.fillStyle = 'black';
+		}
+		else
+		{
+			context.fillStyle = '#' + Math.floor(Math.random()*16777215).toString(16);
+
+		}
 	}
 	context.fill();
 	context.stroke();
 }
 
 
-function toggleAnimation()
-{	
-	if(!running)
+function updateInterval()
+{
+	var speed = document.getElementById('intervalInput').value;
+	if(isNaN(speed) || speed == 0)
 	{
-		timer = setInterval("animate()", 100);
-		running = true;
+		document.getElementById('errorBox').innerHTML = 'Please enter a valid number.';
+		setTimeout("document.getElementById('errorBox').innerHTML = ''", 1300);
+		return false;
 	}
 	else
 	{
-		clearInterval(timer);
-		running = false;
+		if(isRunning)
+		{
+			toggleAnimation();
+			toggleAnimation();
+		}
+	}
+	return true;
+}
+
+function toggleAnimation()
+{	
+	if(!isRunning && !updateInterval())
+	{
+		return;
+	}
+	var speed = document.getElementById('intervalInput').value;
+	if(!isRunning)
+	{
+		for(var x = 0; x < gridWidth; x++)
+		{
+			for(var y = 0; y < gridHeight; y++)
+			{	
+				savedState[x][y] = state[x][y];
+			}
+		}
+				
+		updateTimer = setInterval("animate()", speed);
+		isRunning = true;
+	}
+	else
+	{
+		clearInterval(updateTimer);
+		isRunning = false;
 	}
 	
 	var button = document.getElementById("startButton");
-	if(running)
+	if(isRunning)
 	{
 		button.innerHTML = 'Stop';
 	}
@@ -190,13 +255,15 @@ function animate()
 			}
 		}
 	}
+	genCount++;
+	document.getElementById('genCount').innerHTML = 'Generation Count: ' + genCount;
 }
 
 
-function resetGrid()
+function clearGrid()
 {	
-	running = false;
-	clearInterval(timer);
+	isRunning = false;
+	clearInterval(updateTimer);
 	document.getElementById('startButton').innerHTML = 'Start';
 	for(var x = 0; x <= gridWidth; x++)
 	{
@@ -214,8 +281,81 @@ function resetGrid()
 			updateCell(x, y, 0);
 		}
 	}
+	genCount = 0;
+	document.getElementById('genCount').innerHTML = 'Generation Count: ' + '0';
 }
 
+function randomizeGrid()
+{
+	isRunning = false;
+	clearInterval(updateTimer);
+	document.getElementById('startButton').innerHTML = 'Start';
+	var new_state;
+	for(var x = 0; x <= gridWidth; x++)
+	{
+		for(var y = 0; y <= gridHeight; y++)
+		{	
+			new_state = Math.floor(Math.random()*2);
+			updateCell(x, y, new_state);
+		}
+	}
+}
+
+function saveState()
+{	
+	if(isRunning){toggleAnimation();}
+	for(var x = 0; x <= gridWidth; x++)
+	{
+		for(var y = 0; y <= gridHeight; y++)
+		{
+			savedState[x][y] = state[x][y];
+		}
+	}
+	tmpGenCount = genCount;
+}
+
+function loadState()
+{
+	if(isRunning){toggleAnimation();}
+	for(var x = 0; x <= gridWidth; x++)
+	{
+		for(var y = 0; y <= gridHeight; y++)
+		{
+			state[x][y] = savedState[x][y];
+		}
+	}
+	genCount = tmpGenCount;
+	document.getElementById('genCount').innerHTML = 'Generation Count: ' + genCount;
+	drawGrid();
+}
+
+function buttonMouseover(element)
+{
+	element.style.border = '3px solid black';
+	element.style.color = 'white';
+	if(element.id == 'startButton')
+	{
+		element.style.margin = '4px 6px 0px 0px';
+	}
+	else
+	{
+		element.style.margin = '4px 6px';
+	}
+}
+
+function buttonMouseOut(element)
+{
+	element.style.border = '2px solid black';
+	element.style.color = 'black';
+	if(element.id == 'startButton')
+	{
+		element.style.margin = '5px 6px 0px 0px';
+	}
+	else
+	{
+		element.style.margin = '5px 6px';
+	}
+}
 
 // JS modulo doesn't work with negatives, this does
 function mod(a, b)
