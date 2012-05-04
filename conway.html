@@ -15,7 +15,7 @@
 		
 		<br/>
 		<div id = 'controlPanel'>
-			Update interval (ms): <input id = 'intervalInput' type='text' value = '500' onChange='updateInterval()' />
+			Update interval (ms): <input id = 'intervalInput' type='text' value = '500' onKeyUp='updateInterval()' />
 			<input id = 'gridLineBox' type = 'checkbox' checked = '' onChange='drawGrid()'/>Show Grid Lines
 			<input id = 'randColorBox' type = 'checkbox'  onChange='drawGrid()'/>Random Colors
 			<span id = 'genCount'>Generation Count: 0</span>
@@ -44,9 +44,9 @@
 			</ul> 
 			
 			<p>
-				Click or drag squares to toggle their states between dead and alive. After pressing start, the automation begins, and each successive generation is computed and displayed.<br/><br/>
-				
-			See the <a href = "http://en.wikipedia.org/wiki/Conway's_Game_of_Life"> Wikipedia article </a> for more information.
+				Click or drag squares to toggle their states between dead and alive. After pressing start, the automation begins, and each successive generation is computed and displayed.
+				<br/><br/>
+				See the <a href = "http://en.wikipedia.org/wiki/Conway's_Game_of_Life"> Wikipedia article </a> for more information.
 			</p> 
 		</div>
 		<hr/>

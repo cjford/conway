@@ -100,7 +100,7 @@ function cellClickHandler(evt)
 		updateCell(cell_x, cell_y, new_state);
 	}
 	
-	if(mouseIsDown  && ((lastUpdate[0] != cell_x) || (lastUpdate[1] != cell_y)))
+	if(mouseIsDown && ((lastUpdate[0] != cell_x) || (lastUpdate[1] != cell_y)))
 	{
 		if((state[cell_x][cell_y] == 1))
 		{
@@ -114,7 +114,6 @@ function cellClickHandler(evt)
 		lastUpdate[1] = cell_y;
 		updateCell(cell_x, cell_y, new_state);
 	}
-
 }
 
 
@@ -299,6 +298,8 @@ function randomizeGrid()
 			updateCell(x, y, new_state);
 		}
 	}
+    genCount = 0;
+	document.getElementById('genCount').innerHTML = 'Generation Count: ' + '0';
 }
 
 function saveState()
